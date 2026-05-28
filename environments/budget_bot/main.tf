@@ -33,6 +33,25 @@ module "lambda_sg" {
   egress_rules   = var.lambda_sg_egress_rules
 }
 
+locals {
+  dynamic_lambdas = {
+    for k, v in var.lambdas : k => merge(v, {
+      environment_variables = merge(v.environment_variables, {
+        "STORAGE_BUCKET"      = module.s3.bucket_ids["csv-data"]
+        "USERSTORE_BACKEND"   = "mysql"
+        "USERSTORE_MYSQL_URL" = "mysql+pymysql://admin:${module.rds.db_password}@${module.rds.rds_db_endpoint}/${module.rds.rds_db_name}"
+      })
+      iam_policy_statements = concat(v.iam_policy_statements, [
+        {
+          effect    = "Allow"
+          actions   = ["s3:PutObject", "s3:GetObject"]
+          resources = ["${module.s3.bucket_arns["csv-data"]}/*", module.s3.bucket_arns["csv-data"]]
+        }
+      ])
+    })
+  }
+}
+
 # 4. Gọi module Lambda để khởi tạo các hàm Lambda trong VPC một cách sạch sẽ
 module "lambda" {
   source = "../../modules/lambda"
@@ -40,7 +59,7 @@ module "lambda" {
   project_name           = var.project_name
   vpc_subnet_ids         = module.vpc.app_subnet_ids
   vpc_security_group_ids = [module.lambda_sg.security_group_id]
-  lambdas                = var.lambdas
+  lambdas                = local.dynamic_lambdas
 }
 
 # 5. Gọi module Cognito để quản lý định danh người dùng

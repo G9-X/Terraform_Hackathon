@@ -98,12 +98,12 @@ api_gateway_routes = {
   "chat" = {
     route_key         = "POST /chat"
     lambda_key        = "chat"
-    enable_authorizer = true
+    enable_authorizer = false
   }
   "upload" = {
     route_key         = "POST /upload"
     lambda_key        = "upload"
-    enable_authorizer = true
+    enable_authorizer = false
   }
 }
 

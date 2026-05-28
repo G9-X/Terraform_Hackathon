@@ -17,3 +17,9 @@ output "rds_db_name" {
   description = "Tên database trong RDS"
   value       = aws_db_instance.this.db_name
 }
+
+output "db_password" {
+  description = "Mật khẩu database"
+  value       = random_password.db_password.result
+  sensitive   = true
+}
