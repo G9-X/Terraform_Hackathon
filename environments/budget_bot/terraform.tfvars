@@ -64,7 +64,8 @@ lambdas = {
     timeout     = 10         # Đủ thời gian gọi Bedrock API
     source_dir  = "src/chat" # Đường dẫn thư mục code nguồn của Chat Lambda
     environment_variables = {
-      "AI_MODEL_ID" = "us.meta.llama3-3-70b-instruct-v1:0"
+      "AI_MODEL_ID"    = "us.meta.llama3-3-70b-instruct-v1:0"
+      "SESSIONS_TABLE" = "budget-bot-sessions"
     }
     iam_policy_statements = [
       {
@@ -84,6 +85,16 @@ lambdas = {
           "arn:aws:s3:::budget-bot-csv-data-dfom3p",
           "arn:aws:s3:::budget-bot-csv-data-dfom3p/*"
         ]
+      },
+      {
+        effect = "Allow"
+        actions = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem"
+        ]
+        resources = ["arn:aws:dynamodb:us-west-2:*:table/budget-bot-sessions"]
       }
     ]
   }
