@@ -1,5 +1,5 @@
-aws_region         = "us-east-1"
-availability_zones = ["us-east-1a", "us-east-1b"]
+aws_region         = "us-west-2"
+availability_zones = ["us-west-2a", "us-west-2b"]
 project_name       = "budget-bot"
 
 vpc_cidr = "10.0.0.0/16"
@@ -10,22 +10,22 @@ public_subnets = {}
 private_subnets = {
   "private-app-a" = {
     cidr_block        = "10.0.1.0/24"
-    availability_zone = "us-east-1a"
+    availability_zone = "us-west-2a"
     type              = "app" # Subnet riêng tư cho các hàm Lambda (Chat & CSV parser)
   }
   "private-app-b" = {
     cidr_block        = "10.0.2.0/24"
-    availability_zone = "us-east-1b"
+    availability_zone = "us-west-2b"
     type              = "app" # Subnet riêng tư dự phòng cho Application
   }
   "private-db-a" = {
     cidr_block        = "10.0.3.0/24"
-    availability_zone = "us-east-1a"
+    availability_zone = "us-west-2a"
     type              = "db" # Subnet riêng tư cho cơ sở dữ liệu RDS (Single AZ chạy tại đây)
   }
   "private-db-b" = {
     cidr_block        = "10.0.4.0/24"
-    availability_zone = "us-east-1b"
+    availability_zone = "us-west-2b"
     type              = "db" # Subnet riêng tư dự phòng phục vụ RDS DB Subnet Group bắt buộc
   }
 }
@@ -33,14 +33,14 @@ private_subnets = {
 # Cấu hình các VPC Endpoints động và cực kỳ tiết kiệm chi phí
 vpc_endpoints = {
   "s3" = {
-    service_name      = "com.amazonaws.us-east-1.s3"
+    service_name      = "com.amazonaws.us-west-2.s3"
     vpc_endpoint_type = "Gateway"
   }
   "bedrock-runtime" = {
-    service_name        = "com.amazonaws.us-east-1.bedrock-runtime"
+    service_name        = "com.amazonaws.us-west-2.bedrock-runtime"
     vpc_endpoint_type   = "Interface"
     private_dns_enabled = true
-    subnet_names        = ["private-app-a"] # Tiết kiệm 50% chi phí: chỉ triển khai Endpoint ở 1 AZ (us-east-1a)
+    subnet_names        = ["private-app-a"] # Tiết kiệm 50% chi phí: chỉ triển khai Endpoint ở 1 AZ (us-west-2a)
   }
 }
 
@@ -63,6 +63,16 @@ lambdas = {
     memory_size = 128        # Cấu hình siêu tiết kiệm chi phí
     timeout     = 10         # Đủ thời gian gọi Bedrock API
     source_dir  = "src/chat" # Đường dẫn thư mục code nguồn của Chat Lambda
+    environment_variables = {
+      "AI_MODEL_ID" = "meta.llama3-3-70b-instruct-v1:0"
+    }
+    iam_policy_statements = [
+      {
+        effect    = "Allow"
+        actions   = ["bedrock:InvokeModel"]
+        resources = ["arn:aws:bedrock:us-west-2::foundation-model/meta.llama3-*"]
+      }
+    ]
   }
   "upload" = {
     handler     = "index.handler"
@@ -70,18 +80,30 @@ lambdas = {
     memory_size = 256          # Cấu hình lớn hơn con chat để parse file CSV
     timeout     = 30           # Timeout lớn hơn để xử lý đồng bộ
     source_dir  = "src/upload" # Đường dẫn thư mục code nguồn của Upload Lambda
+    environment_variables = {
+      "AI_MODEL_ID" = "amazon.nova-2-lite-v1:0"
+    }
+    iam_policy_statements = [
+      {
+        effect    = "Allow"
+        actions   = ["bedrock:InvokeModel"]
+        resources = ["arn:aws:bedrock:us-west-2::foundation-model/amazon.nova-*"]
+      }
+    ]
   }
 }
 
 # Cấu hình Routes cho API Gateway
 api_gateway_routes = {
   "chat" = {
-    route_key  = "POST /chat"
-    lambda_key = "chat"
+    route_key         = "POST /chat"
+    lambda_key        = "chat"
+    enable_authorizer = true
   }
   "upload" = {
-    route_key  = "POST /upload"
-    lambda_key = "upload"
+    route_key         = "POST /upload"
+    lambda_key        = "upload"
+    enable_authorizer = true
   }
 }
 
@@ -90,4 +112,24 @@ rds_db_allocated_storage = 20
 rds_db_instance_class    = "db.t3.micro"
 rds_db_name              = "budgetdb"
 rds_multi_az             = false
+
+# Cấu hình Cognito
+cognito_clients = {
+  "web-client" = {
+    generate_secret                      = false
+    explicit_auth_flows                  = ["ALLOW_USER_SRP_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"]
+    allowed_oauth_flows_user_pool_client = false
+    allowed_oauth_flows                  = []
+    callback_urls                        = ["https://localhost:3000"]
+    logout_urls                          = ["https://localhost:3000"]
+  }
+}
+
+# Cấu hình CloudFront
+cloudfront_default_cache_behavior = {
+  target_origin_id       = "frontend_s3_origin"
+  viewer_protocol_policy = "redirect-to-https"
+  allowed_methods        = ["GET", "HEAD"]
+  cached_methods         = ["GET", "HEAD"]
+}
 

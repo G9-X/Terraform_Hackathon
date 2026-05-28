@@ -110,3 +110,32 @@ variable "rds_multi_az" {
   description = "Bật/Tắt chế độ Multi-AZ cho RDS"
   type        = bool
 }
+
+variable "cognito_clients" {
+  description = "Bản đồ cấu hình các Cognito User Pool Clients cần tạo"
+  type = map(object({
+    generate_secret     = optional(bool, false)
+    explicit_auth_flows = optional(list(string), ["ALLOW_USER_SRP_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"])
+  }))
+  default = {}
+}
+
+variable "cloudfront_s3_origins" {
+  description = "Bản đồ các S3 origins cho CloudFront"
+  type = map(object({
+    domain_name = string
+    bucket_id   = string
+    bucket_arn  = string
+  }))
+  default = {}
+}
+
+variable "cloudfront_default_cache_behavior" {
+  description = "Cấu hình cache behavior mặc định cho CloudFront"
+  type = object({
+    target_origin_id       = string
+    viewer_protocol_policy = optional(string, "redirect-to-https")
+    allowed_methods        = optional(list(string), ["GET", "HEAD", "OPTIONS"])
+    cached_methods         = optional(list(string), ["GET", "HEAD"])
+  })
+}

@@ -36,3 +36,9 @@ variable "lambda_arns" {
   type        = map(string)
   default     = {}
 }
+
+variable "enable_cognito_authorizer" {
+  description = "Bật/tắt Cognito JWT Authorizer cho API Gateway"
+  type        = bool
+  default     = false
+}

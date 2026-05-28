@@ -71,8 +71,8 @@ variable "clients" {
     supported_identity_providers         = optional(list(string), ["COGNITO"])
     callback_urls                        = optional(list(string), [])
     logout_urls                          = optional(list(string), [])
-    allowed_oauth_flows                  = optional(list(string), ["code"])
-    allowed_oauth_scopes                 = optional(list(string), ["phone", "email", "openid", "profile", "aws.cognito.signin.user.admin"])
+    allowed_oauth_flows                  = optional(list(string), [])
+    allowed_oauth_scopes                 = optional(list(string), [])
     allowed_oauth_flows_user_pool_client = optional(bool, false)
   }))
   default = {}
