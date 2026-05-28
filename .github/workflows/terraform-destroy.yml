@@ -4,14 +4,14 @@ on:
   workflow_dispatch: # Cho phép nhấn nút chạy thủ công trên giao diện GitHub
     inputs:
       environment:
-        description: 'Environment to destroy (dev, prod, or main)'
+        description: 'Environment to destroy (dev, prod, or budget_bot)'
         required: true
-        default: 'dev'
+        default: 'budget_bot'
         type: choice
         options:
           - dev
           - prod
-          - main
+          - budget_bot
 
 permissions:
   contents: read
@@ -37,6 +37,8 @@ jobs:
             echo "env_path=environments/dev" >> $GITHUB_OUTPUT
           elif [ "${{ github.event.inputs.environment }}" == "prod" ]; then
             echo "env_path=environments/prod" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event.inputs.environment }}" == "budget_bot" ]; then
+            echo "env_path=environments/budget_bot" >> $GITHUB_OUTPUT
           else
             echo "env_path=." >> $GITHUB_OUTPUT
           fi
