@@ -60,7 +60,7 @@ module "api_gateway" {
   lambda_arns                = module.lambda.lambda_arns
   routes                     = var.api_gateway_routes
   cognito_user_pool_endpoint = module.cognito.user_pool_endpoint
-  cognito_client_ids         = [for client in module.cognito.app_clients : client.id]
+  cognito_client_ids         = values(module.cognito.client_ids)
 }
 
 # 7. Gọi module CloudFront để phân phối Frontend qua giao thức HTTPS bảo mật
