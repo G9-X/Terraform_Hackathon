@@ -1,7 +1,14 @@
+resource "random_string" "suffix" {
+  for_each = var.buckets
+  length   = 6
+  special  = false
+  upper    = false
+}
+
 resource "aws_s3_bucket" "this" {
   for_each = var.buckets
 
-  bucket        = "${var.project_name}-${each.key}"
+  bucket        = "${var.project_name}-${each.key}-${random_string.suffix[each.key].result}"
   force_destroy = true # Hỗ trợ hủy nhanh tài nguyên khi dọn dẹp môi trường
 
   tags = {

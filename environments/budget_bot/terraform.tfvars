@@ -110,8 +110,9 @@ rds_multi_az             = false
 # Cấu hình Cognito
 cognito_clients = {
   "web-client" = {
-    generate_secret     = false
-    explicit_auth_flows = ["ALLOW_USER_SRP_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"]
+    generate_secret                      = false
+    explicit_auth_flows                  = ["ALLOW_USER_SRP_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"]
+    allowed_oauth_flows_user_pool_client = false
   }
 }
 
