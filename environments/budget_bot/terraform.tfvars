@@ -114,6 +114,8 @@ cognito_clients = {
     explicit_auth_flows                  = ["ALLOW_USER_SRP_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"]
     allowed_oauth_flows_user_pool_client = false
     allowed_oauth_flows                  = []
+    callback_urls                        = ["https://localhost:3000"]
+    logout_urls                          = ["https://localhost:3000"]
   }
 }
 
