@@ -117,6 +117,13 @@ resource "aws_cloudfront_distribution" "this" {
     minimum_protocol_version       = var.acm_certificate_arn != null ? "TLSv1.2_2021" : null
   }
 
+  lifecycle {
+    ignore_changes = [
+      aliases,
+      viewer_certificate
+    ]
+  }
+
   tags = {
     Name = "${var.project_name}-cloudfront"
   }
