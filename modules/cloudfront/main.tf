@@ -3,6 +3,30 @@ locals {
   has_s3_origin = length(var.s3_origins) > 0
 }
 
+resource "aws_cloudfront_function" "uri_rewrite" {
+  name    = "${var.project_name}-uri-rewrite"
+  runtime = "cloudfront-js-1.0"
+  comment = "Rewrite URIs for Next.js App Router static export"
+  publish = true
+  code    = <<-EOT
+function handler(event) {
+    var request = event.request;
+    var uri = request.uri;
+    
+    // Check whether the URI is missing a file name.
+    if (uri.endsWith('/')) {
+        request.uri += 'index.html';
+    } 
+    // Check whether the URI is missing a file extension.
+    else if (!uri.includes('.')) {
+        request.uri += '/index.html';
+    }
+
+    return request;
+}
+EOT
+}
+
 # 1. Khởi tạo Origin Access Control (OAC) cho các S3 origins
 resource "aws_cloudfront_origin_access_control" "this" {
   count                             = local.has_s3_origin ? 1 : 0
@@ -46,36 +70,6 @@ resource "aws_cloudfront_distribution" "this" {
       }
     }
   }
-
-# 1.5 CloudFront Function để sửa lỗi định tuyến Next.js App Router (Static Export)
-resource "aws_cloudfront_function" "uri_rewrite" {
-  name    = "${var.project_name}-uri-rewrite"
-  runtime = "cloudfront-js-1.0"
-  comment = "Thêm index.html vào URI cho thư mục con (Next.js trailingSlash)"
-  publish = true
-  code    = <<-EOT
-function handler(event) {
-    var request = event.request;
-    var uri = request.uri;
-    
-    // Nếu request yêu cầu Next.js payload (_next/data) thì giữ nguyên
-    if (uri.startsWith('/_next/')) {
-        return request;
-    }
-    
-    // Thêm index.html nếu URI kết thúc bằng /
-    if (uri.endsWith('/')) {
-        request.uri += 'index.html';
-    } 
-    // Nếu URI không chứa đuôi mở rộng (ví dụ .css, .js)
-    else if (!uri.includes('.')) {
-        request.uri += '/index.html';
-    }
-
-    return request;
-}
-  EOT
-}
 
   # Cache Behavior Mặc định
   default_cache_behavior {
