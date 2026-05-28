@@ -139,3 +139,18 @@ variable "cloudfront_default_cache_behavior" {
     cached_methods         = optional(list(string), ["GET", "HEAD"])
   })
 }
+
+variable "NEXT_PUBLIC_COGNITO_USER_POOL_ID" {
+  description = "ID của Cognito User Pool"
+  type        = string
+}
+
+variable "NEXT_PUBLIC_COGNITO_CLIENT_ID" {
+  description = "Client ID của ứng dụng Cognito User Pool Client"
+  type        = string
+}
+
+variable "NEXT_PUBLIC_COGNITO_REGION" {
+  description = "Vùng AWS (Region) nơi triển khai Cognito User Pool"
+  type        = string
+}

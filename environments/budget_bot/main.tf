@@ -37,9 +37,12 @@ locals {
   dynamic_lambdas = {
     for k, v in var.lambdas : k => merge(v, {
       environment_variables = merge(v.environment_variables, {
-        "STORAGE_BUCKET"         = module.s3.bucket_ids["csv-data"]
-        "USERSTORE_BACKEND"      = "postgres"
-        "USERSTORE_POSTGRES_URL" = "postgresql://dbadmin:${module.rds.db_password}@${module.rds.rds_db_endpoint}/${module.rds.rds_db_name}"
+        "STORAGE_BUCKET"                   = module.s3.bucket_ids["csv-data"]
+        "USERSTORE_BACKEND"                = "postgres"
+        "USERSTORE_POSTGRES_URL"           = "postgresql://dbadmin:${module.rds.db_password}@${module.rds.rds_db_endpoint}/${module.rds.rds_db_name}"
+        "NEXT_PUBLIC_COGNITO_USER_POOL_ID" = var.NEXT_PUBLIC_COGNITO_USER_POOL_ID
+        "NEXT_PUBLIC_COGNITO_CLIENT_ID"    = var.NEXT_PUBLIC_COGNITO_CLIENT_ID
+        "NEXT_PUBLIC_COGNITO_REGION"       = var.NEXT_PUBLIC_COGNITO_REGION
       })
       iam_policy_statements = concat(v.iam_policy_statements, [
         {
