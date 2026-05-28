@@ -76,12 +76,14 @@ lambdas = {
 # Cấu hình Routes cho API Gateway
 api_gateway_routes = {
   "chat" = {
-    route_key  = "POST /chat"
-    lambda_key = "chat"
+    route_key         = "POST /chat"
+    lambda_key        = "chat"
+    enable_authorizer = true
   }
   "upload" = {
-    route_key  = "POST /upload"
-    lambda_key = "upload"
+    route_key         = "POST /upload"
+    lambda_key        = "upload"
+    enable_authorizer = true
   }
 }
 
@@ -90,4 +92,20 @@ rds_db_allocated_storage = 20
 rds_db_instance_class    = "db.t3.micro"
 rds_db_name              = "budgetdb"
 rds_multi_az             = false
+
+# Cấu hình Cognito
+cognito_clients = {
+  "web-client" = {
+    generate_secret     = false
+    explicit_auth_flows = ["ALLOW_USER_SRP_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"]
+  }
+}
+
+# Cấu hình CloudFront
+cloudfront_default_cache_behavior = {
+  target_origin_id       = "frontend_s3_origin"
+  viewer_protocol_policy = "redirect-to-https"
+  allowed_methods        = ["GET", "HEAD"]
+  cached_methods         = ["GET", "HEAD"]
+}
 

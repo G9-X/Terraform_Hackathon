@@ -43,17 +43,42 @@ module "lambda" {
   lambdas                = var.lambdas
 }
 
-# 5. Gọi module API Gateway để tạo HTTP API định tuyến tới các Lambda một cách sạch sẽ
+# 5. Gọi module Cognito để quản lý định danh người dùng
+module "cognito" {
+  source = "../../modules/cognito"
+
+  project_name = var.project_name
+  clients      = var.cognito_clients
+}
+
+# 6. Gọi module API Gateway để tạo HTTP API định tuyến tới các Lambda một cách sạch sẽ
 module "api_gateway" {
   source = "../../modules/api_gateway"
 
-  project_name = var.project_name
-  stage_name   = "$default"
-  lambda_arns  = module.lambda.lambda_arns
-  routes       = var.api_gateway_routes
+  project_name               = var.project_name
+  stage_name                 = "$default"
+  lambda_arns                = module.lambda.lambda_arns
+  routes                     = var.api_gateway_routes
+  cognito_user_pool_endpoint = module.cognito.user_pool_endpoint
+  cognito_client_ids         = [for client in module.cognito.app_clients : client.id]
 }
 
-# 6. Gọi module RDS để khởi tạo cơ sở dữ liệu Single AZ tiết kiệm chi phí
+# 7. Gọi module CloudFront để phân phối Frontend qua giao thức HTTPS bảo mật
+module "cloudfront" {
+  source = "../../modules/cloudfront"
+
+  project_name = var.project_name
+  s3_origins = {
+    "frontend_s3_origin" = {
+      domain_name = module.s3.bucket_regional_domain_names["frontend"]
+      bucket_id   = "frontend"
+      bucket_arn  = "" # Chỉ cần nếu cần setup OAC, ở đây ta dùng default S3 config
+    }
+  }
+  default_cache_behavior = var.cloudfront_default_cache_behavior
+}
+
+# 8. Gọi module RDS để khởi tạo cơ sở dữ liệu Single AZ tiết kiệm chi phí
 module "rds" {
   source = "../../modules/rds"
 
