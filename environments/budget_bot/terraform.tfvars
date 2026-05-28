@@ -30,10 +30,13 @@ private_subnets = {
   }
 }
 
-# Cấu hình các VPC Endpoints động và cực kỳ tiết kiệm chi phí
 vpc_endpoints = {
   "s3" = {
     service_name      = "com.amazonaws.us-west-2.s3"
+    vpc_endpoint_type = "Gateway"
+  }
+  "dynamodb" = {
+    service_name      = "com.amazonaws.us-west-2.dynamodb"
     vpc_endpoint_type = "Gateway"
   }
   "bedrock-runtime" = {
