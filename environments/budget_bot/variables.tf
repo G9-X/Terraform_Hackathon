@@ -86,8 +86,9 @@ variable "lambdas" {
 variable "api_gateway_routes" {
   description = "Bản đồ cấu hình các routes cho API Gateway"
   type = map(object({
-    route_key  = string
-    lambda_key = string
+    route_key         = string
+    lambda_key        = string
+    enable_authorizer = optional(bool, false)
   }))
 }
 
