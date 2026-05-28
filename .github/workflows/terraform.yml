@@ -65,6 +65,8 @@ jobs:
       # 4. Setup Terraform CLI
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
 
       # 4.5. Bootstrap S3 Backend Bucket (Giải quyết bài toán con gà quả trứng)
       - name: Ensure S3 Backend Bucket Exists
@@ -130,7 +132,19 @@ jobs:
       - name: Terraform Plan
         run: |
           cd ${{ steps.environment.outputs.env_path }}
-          terraform plan -input=false -out=tfplan # -out=tfplan sẽ lưu kế hoạch vào file tfplan để sử dụng ở bước apply sau này
+          set +e
+          terraform plan -no-color -input=false -out=tfplan 2>plan_stderr.txt
+          PLAN_EXIT=$?
+          echo ""
+          echo "========================================="
+          echo "Terraform exit code: $PLAN_EXIT"
+          echo "========================================="
+          if [ -s plan_stderr.txt ]; then
+            echo "=== STDERR OUTPUT ==="
+            cat plan_stderr.txt
+            echo "=== END STDERR ==="
+          fi
+          exit $PLAN_EXIT
 
       # 9. Apply Terraform changes (chỉ khi push vào dev, production hoặc budget_bot)
       - name: Terraform Apply
