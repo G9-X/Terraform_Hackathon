@@ -64,16 +64,14 @@ lambdas = {
     timeout     = 10         # Đủ thời gian gọi Bedrock API
     source_dir  = "src/chat" # Đường dẫn thư mục code nguồn của Chat Lambda
     environment_variables = {
-      "AI_MODEL_ID" = "us.meta.llama3-3-70b-instruct-v1:0"
+      "AI_MODEL_ID" = "meta.llama3-3-70b-instruct-v1:0"
     }
     iam_policy_statements = [
       {
         effect  = "Allow"
         actions = ["bedrock:InvokeModel"]
         resources = [
-          "arn:aws:bedrock:us-west-2:*:inference-profile/us.meta.llama3-3-70b-instruct-v1:0",
-          "arn:aws:bedrock:us-west-2::foundation-model/meta.llama3-3-70b-instruct-v1:0",
-          "arn:aws:bedrock:us-east-1::foundation-model/meta.llama3-3-70b-instruct-v1:0"
+          "arn:aws:bedrock:us-west-2::foundation-model/meta.llama3-3-70b-instruct-v1:0"
         ]
       },
       {
@@ -93,16 +91,14 @@ lambdas = {
     timeout     = 30           # Timeout lớn hơn để xử lý đồng bộ
     source_dir  = "src/upload" # Đường dẫn thư mục code nguồn của Upload Lambda
     environment_variables = {
-      "AI_MODEL_ID" = "us.amazon.nova-lite-v1:0"
+      "AI_MODEL_ID" = "amazon.nova-lite-v1:0"
     }
     iam_policy_statements = [
       {
         effect  = "Allow"
         actions = ["bedrock:InvokeModel"]
         resources = [
-          "arn:aws:bedrock:us-west-2:*:inference-profile/us.amazon.nova-lite-v1:0",
-          "arn:aws:bedrock:us-west-2::foundation-model/amazon.nova-lite-v1:0",
-          "arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-lite-v1:0"
+          "arn:aws:bedrock:us-west-2::foundation-model/amazon.nova-lite-v1:0"
         ]
       },
       {
