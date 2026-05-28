@@ -46,7 +46,7 @@ resource "aws_db_instance" "this" {
   instance_class    = var.db_instance_class
 
   db_name  = var.db_name
-  username = "admin"
+  username = "dbadmin"
   password = random_password.db_password.result # self-managed
 
   multi_az               = var.multi_az
