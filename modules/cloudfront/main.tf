@@ -47,6 +47,36 @@ resource "aws_cloudfront_distribution" "this" {
     }
   }
 
+# 1.5 CloudFront Function để sửa lỗi định tuyến Next.js App Router (Static Export)
+resource "aws_cloudfront_function" "uri_rewrite" {
+  name    = "${var.project_name}-uri-rewrite"
+  runtime = "cloudfront-js-1.0"
+  comment = "Thêm index.html vào URI cho thư mục con (Next.js trailingSlash)"
+  publish = true
+  code    = <<-EOT
+function handler(event) {
+    var request = event.request;
+    var uri = request.uri;
+    
+    // Nếu request yêu cầu Next.js payload (_next/data) thì giữ nguyên
+    if (uri.startsWith('/_next/')) {
+        return request;
+    }
+    
+    // Thêm index.html nếu URI kết thúc bằng /
+    if (uri.endsWith('/')) {
+        request.uri += 'index.html';
+    } 
+    // Nếu URI không chứa đuôi mở rộng (ví dụ .css, .js)
+    else if (!uri.includes('.')) {
+        request.uri += '/index.html';
+    }
+
+    return request;
+}
+  EOT
+}
+
   # Cache Behavior Mặc định
   default_cache_behavior {
     target_origin_id       = var.default_cache_behavior.target_origin_id
@@ -63,6 +93,11 @@ resource "aws_cloudfront_distribution" "this" {
       cookies {
         forward = "none"
       }
+    }
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.uri_rewrite.arn
     }
   }
 
