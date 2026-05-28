@@ -1,6 +1,17 @@
 name: 'Terraform Infrastructure'
 
 on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy (dev, prod, or main)'
+        required: true
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - prod
+          - budget_bot
   push:
     branches: ['main', 'dev', 'production', 'budget_bot']
   pull_request:
