@@ -3,30 +3,6 @@ locals {
   has_s3_origin = length(var.s3_origins) > 0
 }
 
-resource "aws_cloudfront_function" "uri_rewrite" {
-  name    = "${var.project_name}-uri-rewrite"
-  runtime = "cloudfront-js-1.0"
-  comment = "Rewrite URIs for Next.js App Router static export"
-  publish = true
-  code    = <<-EOT
-function handler(event) {
-    var request = event.request;
-    var uri = request.uri;
-    
-    // Check whether the URI is missing a file name.
-    if (uri.endsWith('/')) {
-        request.uri += 'index.html';
-    } 
-    // Check whether the URI is missing a file extension.
-    else if (!uri.includes('.')) {
-        request.uri += '/index.html';
-    }
-
-    return request;
-}
-EOT
-}
-
 # 1. Khởi tạo Origin Access Control (OAC) cho các S3 origins
 resource "aws_cloudfront_origin_access_control" "this" {
   count                             = local.has_s3_origin ? 1 : 0
@@ -71,7 +47,9 @@ resource "aws_cloudfront_distribution" "this" {
     }
   }
 
-  # Cache Behavior Mặc định
+  # CloudFront Function để hỗ trợ Next.js App Router (thêm index.html)
+  # Khắc phục lỗi S3 trả về 403 khi truy cập trực tiếp vào các đường dẫn không có phần mở rộng
+  # hoặc đường dẫn kết thúc bằng dấu gạch chéo (trailing slash).
   default_cache_behavior {
     target_origin_id       = var.default_cache_behavior.target_origin_id
     viewer_protocol_policy = var.default_cache_behavior.viewer_protocol_policy
@@ -91,7 +69,7 @@ resource "aws_cloudfront_distribution" "this" {
 
     function_association {
       event_type   = "viewer-request"
-      function_arn = aws_cloudfront_function.uri_rewrite.arn
+      function_arn = aws_cloudfront_function.nextjs_router.arn
     }
   }
 
@@ -156,6 +134,31 @@ resource "aws_cloudfront_distribution" "this" {
   tags = {
     Name = "${var.project_name}-cloudfront"
   }
+}
+
+resource "aws_cloudfront_function" "nextjs_router" {
+  name    = "${var.project_name}-nextjs-router"
+  runtime = "cloudfront-js-2.0"
+  comment = "Append index.html to Next.js routes for S3 static hosting"
+  publish = true
+  code    = <<EOF
+function handler(event) {
+    var request = event.request;
+    var uri = request.uri;
+    
+    // Nếu request yêu cầu file .txt (RSC payload) thì giữ nguyên, Next.js sẽ tự lấy đúng file.
+    // Nếu kết thúc bằng gạch chéo (ví dụ /auth/sign-in/) -> tự thêm index.html
+    if (uri.endsWith('/')) {
+        request.uri += 'index.html';
+    } 
+    // Nếu không có extension (không chứa dấu chấm) -> thêm /index.html
+    else if (!uri.includes('.')) {
+        request.uri += '/index.html';
+    }
+
+    return request;
+}
+EOF
 }
 
 # 4. Tự động đính kèm S3 Bucket Policy cho các S3 origins, chỉ cho phép Cloudfront truy cập
