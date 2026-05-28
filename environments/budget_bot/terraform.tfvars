@@ -64,13 +64,21 @@ lambdas = {
     timeout     = 10         # Đủ thời gian gọi Bedrock API
     source_dir  = "src/chat" # Đường dẫn thư mục code nguồn của Chat Lambda
     environment_variables = {
-      "AI_MODEL_ID" = "meta.llama3-3-70b-instruct-v1:0"
+      "AI_MODEL_ID" = "us.meta.llama3-3-70b-instruct-v1:0"
     }
     iam_policy_statements = [
       {
         effect    = "Allow"
         actions   = ["bedrock:InvokeModel"]
-        resources = ["arn:aws:bedrock:us-west-2::foundation-model/meta.llama3-*"]
+        resources = ["*"]
+      },
+      {
+        effect  = "Allow"
+        actions = ["s3:PutObject", "s3:GetObject"]
+        resources = [
+          "arn:aws:s3:::budget-bot-csv-data-dfom3p",
+          "arn:aws:s3:::budget-bot-csv-data-dfom3p/*"
+        ]
       }
     ]
   }
@@ -81,13 +89,21 @@ lambdas = {
     timeout     = 30           # Timeout lớn hơn để xử lý đồng bộ
     source_dir  = "src/upload" # Đường dẫn thư mục code nguồn của Upload Lambda
     environment_variables = {
-      "AI_MODEL_ID" = "amazon.nova-2-lite-v1:0"
+      "AI_MODEL_ID" = "us.amazon.nova-lite-v1:0"
     }
     iam_policy_statements = [
       {
         effect    = "Allow"
         actions   = ["bedrock:InvokeModel"]
-        resources = ["arn:aws:bedrock:us-west-2::foundation-model/amazon.nova-*"]
+        resources = ["*"]
+      },
+      {
+        effect  = "Allow"
+        actions = ["s3:PutObject", "s3:GetObject"]
+        resources = [
+          "arn:aws:s3:::budget-bot-csv-data-dfom3p",
+          "arn:aws:s3:::budget-bot-csv-data-dfom3p/*"
+        ]
       }
     ]
   }
@@ -98,12 +114,37 @@ api_gateway_routes = {
   "chat" = {
     route_key         = "POST /chat"
     lambda_key        = "chat"
-    enable_authorizer = false
+    enable_authorizer = true
   }
   "upload" = {
     route_key         = "POST /upload"
     lambda_key        = "upload"
-    enable_authorizer = false
+    enable_authorizer = true
+  }
+  "get_transactions" = {
+    route_key         = "GET /transactions"
+    lambda_key        = "chat"
+    enable_authorizer = true
+  }
+  "update_transaction" = {
+    route_key         = "PUT /transactions/{txn_id}"
+    lambda_key        = "chat"
+    enable_authorizer = true
+  }
+  "create_rule" = {
+    route_key         = "POST /rules"
+    lambda_key        = "chat"
+    enable_authorizer = true
+  }
+  "get_summary" = {
+    route_key         = "GET /summary"
+    lambda_key        = "chat"
+    enable_authorizer = true
+  }
+  "delete_transactions" = {
+    route_key         = "DELETE /transactions"
+    lambda_key        = "chat"
+    enable_authorizer = true
   }
 }
 
