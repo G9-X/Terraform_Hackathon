@@ -68,9 +68,12 @@ lambdas = {
     }
     iam_policy_statements = [
       {
-        effect    = "Allow"
-        actions   = ["bedrock:InvokeModel"]
-        resources = ["*"]
+        effect  = "Allow"
+        actions = ["bedrock:InvokeModel"]
+        resources = [
+          "arn:aws:bedrock:us-west-2:*:inference-profile/us.meta.llama3-3-70b-instruct-v1:0",
+          "arn:aws:bedrock:us-west-2::foundation-model/meta.llama3-3-70b-instruct-v1:0"
+        ]
       },
       {
         effect  = "Allow"
@@ -93,9 +96,12 @@ lambdas = {
     }
     iam_policy_statements = [
       {
-        effect    = "Allow"
-        actions   = ["bedrock:InvokeModel"]
-        resources = ["*"]
+        effect  = "Allow"
+        actions = ["bedrock:InvokeModel"]
+        resources = [
+          "arn:aws:bedrock:us-west-2:*:inference-profile/us.amazon.nova-lite-v1:0",
+          "arn:aws:bedrock:us-west-2::foundation-model/amazon.nova-lite-v1:0"
+        ]
       },
       {
         effect  = "Allow"
