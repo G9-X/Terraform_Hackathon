@@ -112,3 +112,28 @@ module "rds" {
   multi_az              = var.rds_multi_az
 }
 
+# 9. Khởi tạo bảng DynamoDB cho Chat Sessions (On-Demand & TTL)
+resource "aws_dynamodb_table" "sessions" {
+  name         = "${var.project_name}-sessions"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "session_id"
+
+  attribute {
+    name = "session_id"
+    type = "S"
+  }
+
+  ttl {
+    attribute_name = "ttl"
+    enabled        = true
+  }
+
+  tags = {
+    Project     = "W7Capstone"
+    Team        = "G9"
+    Owner       = "G9"
+    Environment = "hackathon"
+  }
+}
+
+
