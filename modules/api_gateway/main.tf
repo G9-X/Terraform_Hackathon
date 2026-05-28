@@ -47,7 +47,7 @@ resource "aws_apigatewayv2_stage" "this" {
 
 # 5. Khởi tạo Cognito JWT Authorizer (chỉ tạo nếu cung cấp Cognito Endpoint)
 resource "aws_apigatewayv2_authorizer" "cognito" {
-  count            = var.cognito_user_pool_endpoint != null ? 1 : 0
+  count            = var.enable_cognito_authorizer ? 1 : 0
   api_id           = aws_apigatewayv2_api.this.id
   name             = "${var.project_name}-cognito-authorizer"
   authorizer_type  = "JWT"
@@ -78,8 +78,8 @@ resource "aws_apigatewayv2_route" "this" {
   target    = "integrations/${aws_apigatewayv2_integration.this[each.key].id}"
 
   # Áp dụng xác thực nếu bật cờ và có cấu hình Cognito
-  authorization_type = each.value.enable_authorizer && var.cognito_user_pool_endpoint != null ? "JWT" : "NONE"
-  authorizer_id      = each.value.enable_authorizer && var.cognito_user_pool_endpoint != null ? aws_apigatewayv2_authorizer.cognito[0].id : null
+  authorization_type = each.value.enable_authorizer && var.enable_cognito_authorizer ? "JWT" : "NONE"
+  authorizer_id      = each.value.enable_authorizer && var.enable_cognito_authorizer ? aws_apigatewayv2_authorizer.cognito[0].id : null
 }
 
 # 8. Cấp quyền tự động cho API Gateway để kích hoạt (invoke) các Lambda Backend

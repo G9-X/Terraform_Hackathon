@@ -59,6 +59,7 @@ module "api_gateway" {
   stage_name                 = "$default"
   lambda_arns                = module.lambda.lambda_arns
   routes                     = var.api_gateway_routes
+  enable_cognito_authorizer  = true
   cognito_user_pool_endpoint = module.cognito.user_pool_endpoint
   cognito_client_ids         = values(module.cognito.client_ids)
 }
