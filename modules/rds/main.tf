@@ -13,8 +13,8 @@ resource "aws_security_group" "rds" {
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port       = 3306
-    to_port         = 3306
+    from_port       = 5432
+    to_port         = 5432
     protocol        = "tcp"
     security_groups = [var.app_security_group_id]
   }
@@ -41,8 +41,8 @@ resource "aws_db_instance" "this" {
   identifier        = "${var.project_name}-db"
   storage_type      = "gp3"
   allocated_storage = var.db_allocated_storage
-  engine            = "mysql"
-  engine_version    = "8.0.45"
+  engine            = "postgres"
+  engine_version    = "16.3"
   instance_class    = var.db_instance_class
 
   db_name  = var.db_name
@@ -50,7 +50,7 @@ resource "aws_db_instance" "this" {
   password = random_password.db_password.result # self-managed
 
   multi_az               = var.multi_az
-  port                   = 3306
+  port                   = 5432
   db_subnet_group_name   = aws_db_subnet_group.this.name
   vpc_security_group_ids = [aws_security_group.rds.id]
   skip_final_snapshot    = true
