@@ -4,11 +4,13 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        description: 'Environment to destroy (budget_bot)'
+        description: 'Environment to destroy (dev, prod, or budget_bot)'
         required: true
         default: 'budget_bot'
         type: choice
         options:
+          - dev
+          - prod
           - budget_bot
 
 permissions:
