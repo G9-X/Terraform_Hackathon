@@ -63,11 +63,14 @@ lambdas = {
     memory_size = 128        # Cấu hình siêu tiết kiệm chi phí
     timeout     = 10         # Đủ thời gian gọi Bedrock API
     source_dir  = "src/chat" # Đường dẫn thư mục code nguồn của Chat Lambda
+    environment_variables = {
+      "AI_MODEL_ID" = "meta.llama3-3-70b-instruct-v1:0"
+    }
     iam_policy_statements = [
       {
         effect    = "Allow"
         actions   = ["bedrock:InvokeModel"]
-        resources = ["arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-*"]
+        resources = ["arn:aws:bedrock:us-east-1::foundation-model/meta.llama3-*"]
       }
     ]
   }
@@ -77,11 +80,14 @@ lambdas = {
     memory_size = 256          # Cấu hình lớn hơn con chat để parse file CSV
     timeout     = 30           # Timeout lớn hơn để xử lý đồng bộ
     source_dir  = "src/upload" # Đường dẫn thư mục code nguồn của Upload Lambda
+    environment_variables = {
+      "AI_MODEL_ID" = "amazon.nova-2-lite-v1:0"
+    }
     iam_policy_statements = [
       {
         effect    = "Allow"
         actions   = ["bedrock:InvokeModel"]
-        resources = ["arn:aws:bedrock:us-east-1::foundation-model/anthropic.claude-*"]
+        resources = ["arn:aws:bedrock:us-east-1::foundation-model/amazon.nova-*"]
       }
     ]
   }
