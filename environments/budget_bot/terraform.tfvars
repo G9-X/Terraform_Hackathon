@@ -73,8 +73,8 @@ lambdas = {
         resources = ["*"]
       },
       {
-        effect    = "Allow"
-        actions   = ["s3:PutObject", "s3:GetObject"]
+        effect  = "Allow"
+        actions = ["s3:PutObject", "s3:GetObject"]
         resources = [
           "arn:aws:s3:::budget-bot-csv-data-dfom3p",
           "arn:aws:s3:::budget-bot-csv-data-dfom3p/*"
@@ -98,8 +98,8 @@ lambdas = {
         resources = ["*"]
       },
       {
-        effect    = "Allow"
-        actions   = ["s3:PutObject", "s3:GetObject"]
+        effect  = "Allow"
+        actions = ["s3:PutObject", "s3:GetObject"]
         resources = [
           "arn:aws:s3:::budget-bot-csv-data-dfom3p",
           "arn:aws:s3:::budget-bot-csv-data-dfom3p/*"
