@@ -72,8 +72,8 @@ module "cloudfront" {
   s3_origins = {
     "frontend_s3_origin" = {
       domain_name = module.s3.bucket_regional_domain_names["frontend"]
-      bucket_id   = "frontend"
-      bucket_arn  = "" # Chỉ cần nếu cần setup OAC, ở đây ta dùng default S3 config
+      bucket_id   = module.s3.bucket_ids["frontend"]
+      bucket_arn  = module.s3.bucket_arns["frontend"]
     }
   }
   default_cache_behavior = var.cloudfront_default_cache_behavior

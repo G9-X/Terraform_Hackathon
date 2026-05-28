@@ -113,6 +113,7 @@ cognito_clients = {
     generate_secret                      = false
     explicit_auth_flows                  = ["ALLOW_USER_SRP_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"]
     allowed_oauth_flows_user_pool_client = false
+    allowed_oauth_flows                  = []
   }
 }
 
