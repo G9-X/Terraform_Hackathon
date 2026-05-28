@@ -1,0 +1,43 @@
+name: 'Terraform Destroy'
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to destroy (budget_bot)'
+        required: true
+        default: 'budget_bot'
+        type: choice
+        options:
+          - budget_bot
+
+permissions:
+  contents: 'read'
+  id-token: 'write'
+
+jobs:
+  terraform-destroy:
+    name: 'Terraform Destroy'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: us-west-2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: |
+          cd environments/${{ github.event.inputs.environment }}
+          terraform init
+
+      - name: Terraform Destroy
+        run: |
+          cd environments/${{ github.event.inputs.environment }}
+          terraform destroy -auto-approve
