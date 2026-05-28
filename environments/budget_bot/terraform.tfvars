@@ -114,12 +114,37 @@ api_gateway_routes = {
   "chat" = {
     route_key         = "POST /chat"
     lambda_key        = "chat"
-    enable_authorizer = false
+    enable_authorizer = true
   }
   "upload" = {
     route_key         = "POST /upload"
     lambda_key        = "upload"
-    enable_authorizer = false
+    enable_authorizer = true
+  }
+  "get_transactions" = {
+    route_key         = "GET /transactions"
+    lambda_key        = "chat"
+    enable_authorizer = true
+  }
+  "update_transaction" = {
+    route_key         = "PUT /transactions/{txn_id}"
+    lambda_key        = "chat"
+    enable_authorizer = true
+  }
+  "create_rule" = {
+    route_key         = "POST /rules"
+    lambda_key        = "chat"
+    enable_authorizer = true
+  }
+  "get_summary" = {
+    route_key         = "GET /summary"
+    lambda_key        = "chat"
+    enable_authorizer = true
+  }
+  "delete_transactions" = {
+    route_key         = "DELETE /transactions"
+    lambda_key        = "chat"
+    enable_authorizer = true
   }
 }
 
