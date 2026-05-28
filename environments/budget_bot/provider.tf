@@ -7,11 +7,12 @@ terraform {
   }
 
   backend "s3" {
-    bucket       = "xbrain-terraform-s3-tfstate"
-    key          = "budget_bot/xbrain-vpc.tfstate"
-    region       = "us-east-1"
-    encrypt      = true
-    use_lockfile = true
+    bucket         = "budgetbot-tfstate-hackathon-w7"
+    key            = "budget_bot/terraform.tfstate"
+    region         = "us-east-1"
+    encrypt        = true
+    dynamodb_table = "budgetbot-terraform-state-lock"
+    use_lockfile   = true
   }
 }
 
