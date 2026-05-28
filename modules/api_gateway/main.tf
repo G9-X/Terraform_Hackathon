@@ -4,6 +4,14 @@ resource "aws_apigatewayv2_api" "this" {
   name          = "${var.project_name}-api"
   protocol_type = "HTTP"
 
+  cors_configuration {
+    allow_origins     = ["*"]
+    allow_methods     = ["*"]
+    allow_headers     = ["*"]
+    allow_credentials = false
+    max_age           = 300
+  }
+
   tags = {
     Name = "${var.project_name}-api"
   }
