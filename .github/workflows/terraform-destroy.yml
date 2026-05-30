@@ -48,7 +48,18 @@ jobs:
           cd ${{ steps.environment.outputs.env_path }}
           terraform init
 
-      - name: Terraform Destroy
+      - name: Terraform Destroy Lambda First
         run: |
           cd ${{ steps.environment.outputs.env_path }}
+          # Hủy riêng Lambda trước để kích hoạt tiến trình giải phóng Hyperplane ENI của AWS
+          terraform destroy -target=module.lambda -auto-approve
+          
+          # Chờ 120 giây (2 phút) để AWS Lambda giải phóng hoàn toàn Network Interface (ENI) khỏi subnets
+          echo "Waiting 120s for AWS Lambda service to detach and clean up Hyperplane ENIs..."
+          sleep 120
+
+      - name: Terraform Destroy Remaining
+        run: |
+          cd ${{ steps.environment.outputs.env_path }}
+          # Tiến hành hủy toàn bộ các tài nguyên hạ tầng còn lại (VPC, Subnets, SGs...)
           terraform destroy -auto-approve
